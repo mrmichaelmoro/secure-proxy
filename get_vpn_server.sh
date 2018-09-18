@@ -29,6 +29,7 @@ fi
 
 NORDHOSTNAME=`python -c "import sys, json; print json.load(open('$NORDJSONTMP'))[0]['hostname']"`
 NORDHOST=`python -c "import sys, json; print json.load(open('$NORDJSONTMP'))[0]['name']"`
+OVPNFILE="/etc/openvpn/$NORDHOSTNAME.udp1194.ovpn"
 
 if [ -z $NORDHOSTNAME ]; then
 	echo "[ERROR]: Unable to parse response from NordVPN."
@@ -39,8 +40,15 @@ echo
 echo "[Recommended NordVPN Server]: $NORDHOST ($NORDHOSTNAME)"
 echo
 
-if [ ! -f /etc/openvpn/$NORDHOSTNAME.udp1194.ovpn ]; then
-	curl -s -o /etc/openvpn/$NORDHOSTNAME.udp1194.ovpn https://downloads.nordcdn.com/configs/files/ovpn_legacy/servers/$NORDHOSTNAME.udp1194.ovpn
+if [ ! -f $OVPNFILE ]; then
+	curl -s -o $OVPNFILE https://downloads.nordcdn.com/configs/files/ovpn_legacy/servers/$NORDHOSTNAME.udp1194.ovpn
+fi
+
+grep "credentials.txt" $OVPNFILE > /dev/null
+MOD_OVPN=$?
+
+if [ $MOD_OVPN == 1 ]; then
+	perl -p -i -e 's/auth-user-pass/auth-user-pass\ credentials\.txt/' $OVPNFILE
 fi
 
 ln -sf /etc/openvpn/$NORDHOSTNAME.udp1194.ovpn /etc/openvpn/default.conf

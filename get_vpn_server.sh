@@ -27,8 +27,8 @@ if [ ! -f $NORDJSONTMP ]; then
 	exit 1
 fi
 
-NORDHOSTNAME=`python "import sys, json; print json.load(open('$NORDJSONTMP'))[0]['hostname']"`
-NORDHOST=`python "import sys, json; print json.load(open('$NORDJSONTMP'))[0]['name']"`
+NORDHOSTNAME=`python -c "import sys, json; print json.load(open('$NORDJSONTMP'))[0]['hostname']"`
+NORDHOST=`python -c "import sys, json; print json.load(open('$NORDJSONTMP'))[0]['name']"`
 
 if [ -z $NORDHOSTNAME ]; then
 	echo "[ERROR]: Unable to parse response from NordVPN."
